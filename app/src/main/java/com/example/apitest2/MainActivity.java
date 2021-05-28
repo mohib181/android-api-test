@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button loginBtn, profileBtn;
+    Button loginBtn, profileBtn, searchBtn, stopBtn;
     EditText email, password;
     TextView details;
     ProgressBar loadingPB;
@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
         loadingPB = findViewById(R.id.progressBar);
 
         profileBtn = findViewById(R.id.profileBtn);
+        searchBtn = findViewById(R.id.searchBtn);
+        stopBtn = findViewById(R.id.stopSearchBtn);
 
         ApiDataService apiDataService = new ApiDataService(MainActivity.this);
 
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 loadingPB.setVisibility(View.VISIBLE);
 
-                apiDataService.getData(email.getText().toString(), password.getText().toString(), new ApiDataService.VolleyResponseListener() {
+                apiDataService.driverLoginData(email.getText().toString(), password.getText().toString(), new ApiDataService.VolleyResponseListener() {
                     @Override
                     public void onError(Object message) {
                         loadingPB.setVisibility(View.GONE);
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
                             System.out.println("body:" + bodyData);
                             System.out.println("headers:" + headerData);
+                            System.out.println(headerData.keys());
 
                             token = (String) headerData.get("Auth-Token");
                             System.out.println("token:" + token);
@@ -83,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 loadingPB.setVisibility(View.VISIBLE);
 
-                apiDataService.getProfileData(token, new ApiDataService.VolleyResponseListener() {
+                apiDataService.getDriverProfileData( token, new ApiDataService.VolleyResponseListener() {
                     @Override
                     public void onError(Object message) {
                         loadingPB.setVisibility(View.GONE);
@@ -107,6 +110,86 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingPB.setVisibility(View.VISIBLE);
 
+                apiDataService.searchPassenger( token, new ApiDataService.VolleyResponseListener() {
+                    @Override
+                    public void onError(Object message) {
+                        loadingPB.setVisibility(View.GONE);
+                        details.setText(message.toString());
+                    }
+
+                    @Override
+                    public void onResponse(Object responseObject) {
+                        loadingPB.setVisibility(View.GONE);
+                        details.setText(responseObject.toString());
+
+
+                        try {
+                            responseData = new JSONObject(responseObject.toString());
+                            System.out.println(responseData);
+
+                            if(responseData.has("passengerInfo")) {
+                                JSONObject passengerInfo = (JSONObject) responseData.get("passengerInfo");
+                                System.out.println(passengerInfo);
+                            } else {
+                                String message =(String) responseData.get("message");
+                                System.out.println(message);
+                                //first time or no match so nothing I guess
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                //data.setText(String.format("%s %s", email.getText(), password.getText()));
+            }
+        });
+
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingPB.setVisibility(View.VISIBLE);
+
+                apiDataService.stopSearchPassenger( token, new ApiDataService.VolleyResponseListener() {
+                    @Override
+                    public void onError(Object message) {
+                        loadingPB.setVisibility(View.GONE);
+                        details.setText(message.toString());
+                    }
+
+                    @Override
+                    public void onResponse(Object responseObject) {
+                        loadingPB.setVisibility(View.GONE);
+                        details.setText(responseObject.toString());
+
+
+                        try {
+                            responseData = new JSONObject(responseObject.toString());
+                            System.out.println(responseData);
+
+                            if(responseData.has("passengerInfo")) {
+                                JSONObject passengerInfo = (JSONObject) responseData.get("passengerInfo");
+                                System.out.println(passengerInfo);
+                            } else {
+                                String message =(String) responseData.get("message");
+                                System.out.println(message);
+                                //first time or no match so nothing I guess
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                //data.setText(String.format("%s %s", email.getText(), password.getText()));
+            }
+        });
     }
 }

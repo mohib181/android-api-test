@@ -13,21 +13,40 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class ApiDataService {
     protected Context context;
-    public static final String BASE_URL = "https://take-me-backend.herokuapp.com";
+    //public static final String BASE_URL = "https://take-me-backend.herokuapp.com";
+    public static final String BASE_URL = "http://172.15.4.67:3000";
+
     public static final String LOCAL_URL = "http://192.168.1.3:3000";
 
     public ApiDataService(Context context) {
         this.context = context;
+    }
+
+    public Map<String, String> makeHeaders(String key, String value) {
+        // below line we are creating a map for
+        // storing our values in key and value pair.
+        Map<String, String> params = new HashMap<>();
+
+        // on below line we are passing our key
+        // and value pair to our parameters.
+        params.put(key, value);
+
+        // at last we are
+        // returning our params.
+        return params;
     }
 
     public interface VolleyResponseListener {
@@ -207,17 +226,7 @@ public class ApiDataService {
                 volleyResponseListener::onError) {
             @Override
             public Map<String, String> getHeaders() {
-                // below line we are creating a map for
-                // storing our values in key and value pair.
-                Map<String, String> params = new HashMap<String, String>();
-
-                // on below line we are passing our key
-                // and value pair to our parameters.
-                params.put("auth-token", token);
-
-                // at last we are
-                // returning our params.
-                return params;
+                return makeHeaders("auth-token", token);
             }
         };
 
@@ -262,17 +271,7 @@ public class ApiDataService {
                 volleyResponseListener::onError) {
             @Override
             public Map<String, String> getHeaders() {
-                // below line we are creating a map for
-                // storing our values in key and value pair.
-                Map<String, String> params = new HashMap<String, String>();
-
-                // on below line we are passing our key
-                // and value pair to our parameters.
-                params.put("auth-token", token);
-
-                // at last we are
-                // returning our params.
-                return params;
+                return makeHeaders("auth-token", token);
             }
         };
 
@@ -307,17 +306,7 @@ public class ApiDataService {
                 volleyResponseListener::onError) {
             @Override
             public Map<String, String> getHeaders() {
-                // below line we are creating a map for
-                // storing our values in key and value pair.
-                Map<String, String> params = new HashMap<String, String>();
-
-                // on below line we are passing our key
-                // and value pair to our parameters.
-                params.put("auth-token", token);
-
-                // at last we are
-                // returning our params.
-                return params;
+                return makeHeaders("auth-token", token);
             }
         };
 
@@ -327,7 +316,6 @@ public class ApiDataService {
     /**
      * A function that matches a custom passenger to the given driverID and removes the driver from the pool
      * @param driverID driverID
-     * @param passengerID passengerID like "607478178c29c1408cfad290"
      * @param volleyResponseListener onResponse
      * I don't think this is needed :3
      *
@@ -342,36 +330,48 @@ public class ApiDataService {
      * }</pre>
      *
      */
-    public void customMatching(String apiRoute, String passengerID, String driverID, VolleyResponseListener volleyResponseListener) {
+    public void customMatching(String driverID, VolleyResponseListener volleyResponseListener) {
 
         // Request a string response from the provided URL.
         //String url = LOCAL_URL + "/api/dummy/owner/reqTest";
-        String url = BASE_URL + "/api/passenger/accept" + "?passengerID=" + passengerID + "&driverID=" + driverID;
+        String url = BASE_URL + "/api/passenger/acceptDriver";
+        //String url = BASE_URL + "/api/dummy/owner/reqTest";
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                volleyResponseListener::onResponse,
-                volleyResponseListener::onError);
+        String[] tokens = {"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDc0NzgxNzhjMjljMTQwOGNmYWQyOTAiLCJpYXQiOjE2MjI1NjQ3NDZ9.JZAM2JfO-QuVD5qbL0wQ7ptsifX3KQEe0kzsWQYo9bA",
+                            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDc0NzgxNzhjMjljMTQwOGNmYWQyOTIiLCJpYXQiOjE2MjI1NjUxMjZ9.S_pl-rQ-lxw6Dc9QM6B4jW6WUGhHdZYGxjd-E4Scsa4",
+                            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDc0NzgxNzhjMjljMTQwOGNmYWQyOTciLCJpYXQiOjE2MjI1NjUxNzB9.Eq9h22EUefCVY9eQSIYI1S0c_VvA3ywW7oSGmviAjyk",
+                            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDc0NzgxODhjMjljMTQwOGNmYWQyOTkiLCJpYXQiOjE2MjI1NjUyMTB9.BrdCkVeT1cdFd1VhrgD7IwKxHDEpkkfIswH2trXcdiE",
+                            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDc0NzgxODhjMjljMTQwOGNmYWQyYTEiLCJpYXQiOjE2MjI1NjUyNTd9.697B5W-LF-5su6jV5vvOdQkOj4WMWuGLWFpJ5CnjBug",
+                            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MDc0NzgxODhjMjljMTQwOGNmYWQyYTUiLCJpYXQiOjE2MjI1NjUyOTJ9.UulbXYNHCxt7u0O7Scj48umJmquWXq7dPdGEhcI-F7k"};
 
-        /*StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+        Random random = new Random();
+        String token = tokens[random.nextInt(tokens.length)];
+
+        double lat = 23 + (random.nextInt(1000000)%75000 + 40000)/100000.0;
+        double lon = 90 + (random.nextInt(1000000)%75000 + 40000)/100000.0;
+        double[] pickUpPoint = {lat, lon};
+
+        Map<String,String> params = new HashMap<>();
+        params.put("driverID", driverID);
+        try {
+            System.out.println(Arrays.toString(pickUpPoint));
+            JSONArray p = new JSONArray(Arrays.toString(pickUpPoint));
+            System.out.println(p);
+            params.put("pickUpPoint", p.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
                 volleyResponseListener::onResponse,
                 volleyResponseListener::onError) {
             @Override
             public Map<String, String> getHeaders() {
-                // below line we are creating a map for
-                // storing our values in key and value pair.
-                Map<String, String> params = new HashMap<String, String>();
-
-                // on below line we are passing our key
-                // and value pair to our parameters.
-                params.put("auth-token", token);
-
-                // at last we are
-                // returning our params.
-                return params;
+                return makeHeaders("auth-token", token);
             }
-        };*/
+        };
 
-        MySingleton.getInstance(context).addToRequestQueue(stringRequest);
+        MySingleton.getInstance(context).addToRequestQueue(request);
     }
 
 }

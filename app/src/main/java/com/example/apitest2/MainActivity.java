@@ -9,12 +9,13 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button loginBtn, profileBtn, searchBtn, stopBtn;
+    Button loginBtn, profileBtn, searchBtn, stopBtn, customMatchBtn;
     EditText email, password;
     TextView details;
     ProgressBar loadingPB;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         profileBtn = findViewById(R.id.profileBtn);
         searchBtn = findViewById(R.id.searchBtn);
         stopBtn = findViewById(R.id.stopSearchBtn);
+        customMatchBtn = findViewById(R.id.matchBtn);
 
         ApiDataService apiDataService = new ApiDataService(MainActivity.this);
 
@@ -67,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
                             System.out.println("headers:" + headerData);
                             System.out.println(headerData.keys());
 
-                            token = (String) headerData.get("Auth-Token");
+                            if (headerData.has("auth-token")) token = (String) headerData.get("auth-token");
+                            else token = (String) headerData.get("Auth-Token");
                             System.out.println("token:" + token);
 
                         } catch (JSONException e) {
@@ -134,7 +137,15 @@ public class MainActivity extends AppCompatActivity {
 
                             if(responseData.has("passengerInfo")) {
                                 JSONObject passengerInfo = (JSONObject) responseData.get("passengerInfo");
-                                System.out.println(passengerInfo);
+
+                                JSONObject passengerData = (JSONObject) passengerInfo.get("passengerData");
+                                JSONArray pickUpPoint = (JSONArray) passengerInfo.get("pickUpPoint");
+
+                                double lat = Double.parseDouble(pickUpPoint.getString(0));
+                                double lon = Double.parseDouble(pickUpPoint.getString(1));
+
+                                System.out.println("passengerData: " + passengerData);
+                                System.out.println("pickUpPoint: " + lat + " , " + lon);
                             } else {
                                 String message =(String) responseData.get("message");
                                 System.out.println(message);
@@ -182,6 +193,35 @@ public class MainActivity extends AppCompatActivity {
                                 //first time or no match so nothing I guess
                             }
 
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                //data.setText(String.format("%s %s", email.getText(), password.getText()));
+            }
+        });
+
+        customMatchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingPB.setVisibility(View.VISIBLE);
+
+                apiDataService.customMatching("607478178c29c1408cfad295", new ApiDataService.VolleyResponseListener() {
+                    @Override
+                    public void onError(Object message) {
+                        loadingPB.setVisibility(View.GONE);
+                        details.setText(message.toString());
+                    }
+
+                    @Override
+                    public void onResponse(Object responseObject) {
+                        loadingPB.setVisibility(View.GONE);
+                        details.setText(responseObject.toString());
+                        try {
+                            responseData = new JSONObject(responseObject.toString());
+                            System.out.println(responseData);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

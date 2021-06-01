@@ -110,14 +110,34 @@
         android:layout_height="wrap_content"
         android:text="search"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/profileBtn"
+        app:layout_constraintHorizontal_bias="0.172"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stopSearchBtn"
+        app:layout_constraintVertical_bias="0.468" />
 
     <Button
         android:id="@+id/stopSearchBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginBottom="8dp"
         android:text="stop"
-        tools:layout_editor_absoluteX="37dp"
-        tools:layout_editor_absoluteY="451dp" />
+        app:layout_constraintBottom_toTopOf="@+id/profileBtn"
+        app:layout_constraintEnd_toStartOf="@+id/profileBtn"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/matchBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="match"
+        app:layout_constraintBottom_toTopOf="@+id/stopSearchBtn"
+        app:layout_constraintEnd_toStartOf="@+id/submitBtn"
+        app:layout_constraintHorizontal_bias="0.255"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordLabel"
+        app:layout_constraintVertical_bias="0.106" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

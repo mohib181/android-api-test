@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button loginBtn, profileBtn, searchBtn, stopBtn, cancelMatchBtn, startRideBtn, endRideBtn, updateLocationBtn, viewBtn, deleteBtn;
+    Button loginBtn, profileBtn, searchBtn, stopBtn, cancelMatchBtn, startRideBtn, endRideBtn, updateLocationBtn, viewBtn, deleteBtn, driverBtn;
     EditText email, password;
     TextView details;
     ProgressBar loadingPB;
@@ -45,10 +45,53 @@ public class MainActivity extends AppCompatActivity {
 
         viewBtn = findViewById(R.id.viewBtn);
         deleteBtn = findViewById(R.id.deletePoolBtn);
+        driverBtn = findViewById(R.id.driverLoginBtn);
 
         ApiDataService apiDataService = new ApiDataService(MainActivity.this);
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingPB.setVisibility(View.VISIBLE);
+
+                apiDataService.getData(email.getText().toString(), password.getText().toString(), new ApiDataService.VolleyResponseListener() {
+                    @Override
+                    public void onError(Object message) {
+                        loadingPB.setVisibility(View.GONE);
+                        details.setText(message.toString());
+                    }
+
+                    @Override
+                    public void onResponse(Object responseObject) {
+                        loadingPB.setVisibility(View.GONE);
+                        details.setText(responseObject.toString());
+                        try {
+                            responseData = new JSONObject(responseObject.toString());
+                            System.out.println(responseData);
+
+                            bodyData = (JSONObject) responseData.get("body");
+                            headerData = (JSONObject) responseData.get("headers");
+
+                            System.out.println("body:" + bodyData);
+                            System.out.println("headers:" + headerData);
+                            System.out.println(headerData.keys());
+
+                            if (headerData.has("auth-token")) token = (String) headerData.get("auth-token");
+                            else token = (String) headerData.get("Auth-Token");
+                            System.out.println("token:" + token);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                //data.setText(String.format("%s %s", email.getText(), password.getText()));
+
+            }
+        });
+
+        driverBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loadingPB.setVisibility(View.VISIBLE);
@@ -351,6 +394,7 @@ public class MainActivity extends AppCompatActivity {
 
                             if (responseData.has("vehicleInfo")) System.out.println(responseData.getString("vehicleInfo"));
                             if (responseData.has("driverInfo")) System.out.println(responseData.getString("driverInfo"));
+                            if (responseData.has("vehicleLocation")) System.out.println(responseData.getString("vehicleLocation"));
                             if (responseData.has("passengerInfo")) System.out.println(responseData.getString("passengerInfo"));
                             if (responseData.has("status")) System.out.println(responseData.getString("status"));
                         } catch (JSONException e) {

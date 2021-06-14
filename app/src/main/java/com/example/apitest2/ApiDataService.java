@@ -26,8 +26,8 @@ import java.util.Random;
 
 public class ApiDataService {
     protected Context context;
-    //public static final String BASE_URL = "https://take-me-backend.herokuapp.com";
-    public static final String BASE_URL = "http://192.168.1.4:3000";
+    public static final String BASE_URL = "https://take-me-backend.herokuapp.com";
+    //public static final String BASE_URL = "http://192.168.1.4:3000";
 
     public static final String LOCAL_URL = "http://192.168.1.3:3000";
 

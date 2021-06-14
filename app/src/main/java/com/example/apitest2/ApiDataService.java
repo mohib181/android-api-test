@@ -27,7 +27,7 @@ import java.util.Random;
 public class ApiDataService {
     protected Context context;
     //public static final String BASE_URL = "https://take-me-backend.herokuapp.com";
-    public static final String BASE_URL = "http://172.15.4.67:3000";
+    public static final String BASE_URL = "http://192.168.1.4:3000";
 
     public static final String LOCAL_URL = "http://192.168.1.3:3000";
 
@@ -374,4 +374,122 @@ public class ApiDataService {
         MySingleton.getInstance(context).addToRequestQueue(request);
     }
 
+    public void cancelMatch(String token, VolleyResponseListener volleyResponseListener) {
+        String url = BASE_URL + "/api/driver/cancelMatch";
+
+        Map<String,String> params = new HashMap<>();
+        params.put("entity", "driver");
+        //System.out.println(new JSONObject(params).toString());
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
+                volleyResponseListener::onResponse,
+                volleyResponseListener::onError){
+            @Override
+            public Map<String, String> getHeaders() {
+                return makeHeaders("auth-token", token);
+            }
+        };
+
+        MySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
+    public void startRide(String token, VolleyResponseListener volleyResponseListener) {
+        String url = BASE_URL + "/api/driver/startRide";
+
+        Map<String,String> params = new HashMap<>();
+        params.put("entity", "driver");
+        //System.out.println(new JSONObject(params).toString());
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
+                volleyResponseListener::onResponse,
+                volleyResponseListener::onError){
+            @Override
+            public Map<String, String> getHeaders() {
+                return makeHeaders("auth-token", token);
+            }
+        };
+
+        MySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
+    public void endRide(String token, double lat, double lon, VolleyResponseListener volleyResponseListener) {
+        String url = BASE_URL + "/api/driver/endRide";
+        double[] location = {lat, lon};
+        Map<String,String> params = new HashMap<>();
+        params.put("entity", "driver");
+        try {
+            System.out.println(Arrays.toString(location));
+            JSONArray p = new JSONArray(Arrays.toString(location));
+            System.out.println(p);
+            params.put("location", p.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        //System.out.println(new JSONObject(params).toString());
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
+                volleyResponseListener::onResponse,
+                volleyResponseListener::onError){
+            @Override
+            public Map<String, String> getHeaders() {
+                return makeHeaders("auth-token", token);
+            }
+        };
+
+        MySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
+    public void updateLocation(String token, double lat, double lon, VolleyResponseListener volleyResponseListener) {
+        String url = BASE_URL + "/api/driver/vehicle/location";
+
+        double[] location = {lat, lon};
+
+        Map<String,String> params = new HashMap<>();
+        try {
+            System.out.println(Arrays.toString(location));
+            JSONArray p = new JSONArray(Arrays.toString(location));
+            System.out.println(p);
+            params.put("location", p.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        //System.out.println(new JSONObject(params).toString());
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
+                volleyResponseListener::onResponse,
+                volleyResponseListener::onError){
+            @Override
+            public Map<String, String> getHeaders() {
+                return makeHeaders("auth-token", token);
+            }
+        };
+
+        MySingleton.getInstance(context).addToRequestQueue(request);
+    }
+
+    public void viewDriver(String token, String vehicleID, VolleyResponseListener volleyResponseListener) {
+        String url = BASE_URL + "/api/owner/vehicle/id/" + vehicleID + "/status";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                volleyResponseListener::onResponse,
+                volleyResponseListener::onError) {
+            @Override
+            public Map<String, String> getHeaders() {
+                return makeHeaders("auth-token", token);
+            }
+        };
+
+        MySingleton.getInstance(context).addToRequestQueue(stringRequest);
+    }
+
+    public void deletePool(VolleyResponseListener volleyResponseListener) {
+        String url = BASE_URL + "/api/driver/pool";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, url,
+                volleyResponseListener::onResponse,
+                volleyResponseListener::onError
+        );
+
+        MySingleton.getInstance(context).addToRequestQueue(stringRequest);
+    }
 }
